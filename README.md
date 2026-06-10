@@ -1,194 +1,414 @@
 # ⚡ LLM Efficiency Gateway
 
-An AI middleware system that reduces LLM API cost and latency using semantic caching, 
-hybrid RAG retrieval, quality-aware model routing, prompt compression, and security 
-guardrails — while preserving answer quality.
+> An AI middleware system that reduces LLM API cost, latency, and token usage using **semantic caching**, **hybrid RAG retrieval**, **prompt compression**, **quality-aware model routing**, and **security guardrails** while preserving answer quality.
 
-> **Result:** 58.1% average cost reduction | 90.9% peak cost reduction | 12ms cache response | 31.2% cache hit rate
-
----
-
-## 🎯 What It Does
-
-Modern AI applications waste money by sending every request to expensive large models.
-This gateway sits between your application and the LLM, intelligently optimizing every request.
-
-| Component | What It Does |
-|---|---|
-| **Semantic Cache** | Reuses previous answers for similar queries — zero LLM cost |
-| **Hybrid Retrieval** | BM25 + vector search for best context retrieval |
-| **CrossEncoder Reranker** | Picks the most relevant chunks before sending to LLM |
-| **Context Pruner** | Stays within token budget, removes low-value chunks |
-| **Prompt Compression** | LLMLingua-2 compresses prompts by ~45% |
-| **Model Router** | Routes simple queries to cheap models, complex ones to strong models |
-| **Security Guard** | Blocks prompt injection, masks PII, detects secrets |
-| **Cost Tracker** | Estimates and tracks API cost per request |
-| **Quality Evaluator** | Measures faithfulness and answer relevancy |
-| **Dashboard** | Real-time Streamlit dashboard with Pareto charts |
+![Python](https://img.shields.io/badge/Python-3.11+-blue)
+![LangGraph](https://img.shields.io/badge/LangGraph-Agent%20Workflow-green)
+![RAG](https://img.shields.io/badge/RAG-Hybrid%20Search-orange)
+![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
 ---
 
-## 🔄 Pipeline
+# 🚀 Key Results
+
+| Metric                  | Value     |
+| ----------------------- | --------- |
+| Average Cost Reduction  | **58.1%** |
+| Peak Cost Reduction     | **90.9%** |
+| Cache Hit Response Time | **12ms**  |
+| Cache Hit Rate          | **31.2%** |
+| Average LLM Latency     | **~1.6s** |
+| Semantic Cache          | ✅         |
+| Hybrid RAG              | ✅         |
+| Model Routing           | ✅         |
+| Prompt Compression      | ✅         |
+| Security Guardrails     | ✅         |
+
+---
+
+# 🎯 Problem Statement
+
+Modern AI applications often send every request to expensive large language models regardless of complexity.
+
+This leads to:
+
+* High API costs
+* Increased latency
+* Token wastage
+* Oversized RAG contexts
+* Poor resource utilization
+
+The **LLM Efficiency Gateway** acts as an optimization layer between users and LLMs, reducing cost and latency without significantly degrading answer quality.
+
+---
+
+# 🏗️ System Architecture
+
+```text
 User Query
-↓ Prompt Injection + PII Guard
-↓ Token Counter + Cost Estimator
-↓ Semantic Cache (ChromaDB)
-├── Cache Hit → Return Answer (12ms, $0.00)
-└── Cache Miss ↓
-↓ Hybrid Search: BM25 + Vector Retrieval
-↓ Retrieved Context Security Check
-↓ CrossEncoder Reranker
-↓ Adaptive Context Pruning
-↓ Prompt Compression (LLMLingua-2)
-↓ Quality-Aware Model Router
-├── Simple query → groq/llama-3.1-8b-instant (cheap)
-└── Complex query → groq/llama-3.3-70b-versatile (strong)
-↓ Answer Generation
-↓ Store to Semantic Cache
-↓ RAGAS Quality Evaluation
-↓ Cost + Token Savings Computed
-↓ SQLite Metrics Storage
-↓ Streamlit Dashboard
+      │
+      ▼
+Prompt Injection + PII Guard
+      │
+      ▼
+Token Counter + Cost Estimator
+      │
+      ▼
+Semantic Cache (ChromaDB)
+
+ ┌─────────────────────────┐
+ │       Cache Hit         │
+ └──────────┬──────────────┘
+            ▼
+     Return Cached Answer
+            ▼
+      Cost Tracker
+
+ ┌─────────────────────────┐
+ │      Cache Miss         │
+ └──────────┬──────────────┘
+            ▼
+Hybrid Retrieval (BM25 + Vector)
+            ▼
+Retrieved Context Security Check
+            ▼
+CrossEncoder Reranker
+            ▼
+Adaptive Context Pruning
+            ▼
+Prompt Compression
+            ▼
+Quality-Aware Model Router
+            ▼
+Answer Generation
+            ▼
+Semantic Cache Update
+            ▼
+Quality Evaluation
+            ▼
+Metrics Storage (SQLite)
+            ▼
+Streamlit Dashboard
+```
 
 ---
 
-## 📊 Benchmark Results
+# 🔥 Features
 
-| Metric | Baseline | Optimised |
-|---|---|---|
-| Avg input tokens | 1,704 | 1,788 |
-| Estimated cost / request | $0.001140 | $0.000136 |
-| Cost reduction | — | **90.9% (peak)** |
-| Avg cost reduction | — | **58.1%** |
-| Cache latency | — | **12ms** |
-| LLM latency | — | ~1.6s |
-| Cache hit rate | — | 31.2% |
+## Semantic Cache
+
+* ChromaDB-powered semantic cache
+* Reuses answers for semantically similar queries
+* Eliminates unnecessary LLM calls
+* Average cache response time: **12ms**
 
 ---
 
-## 🛠️ Tech Stack
+## Hybrid Retrieval
 
-| Layer | Stack |
-|---|---|
-| Workflow | LangGraph, LangChain |
-| LLM | Groq API (llama-3.1-8b-instant, llama-3.3-70b-versatile) via LiteLLM |
-| RAG | ChromaDB, BM25, HuggingFace Embeddings, CrossEncoder |
-| Compression | LLMLingua-2 |
-| Security | Custom regex guard (prompt injection, PII, secrets) |
-| Evaluation | Text-overlap (faithfulness + relevancy) |
-| Token Counting | tiktoken |
-| Storage | SQLite |
-| Dashboard | Streamlit + Plotly |
+Combines:
+
+* BM25 lexical search
+* Dense vector retrieval
+* HuggingFace embeddings
+
+Provides better recall than either retrieval method alone.
 
 ---
 
-## 🚀 Getting Started
+## CrossEncoder Reranking
 
-## 1. Clone the repo
-``bash
+Uses a CrossEncoder model to:
+
+* Re-rank retrieved chunks
+* Select only highly relevant context
+* Improve retrieval precision
+
+---
+
+## Adaptive Context Pruning
+
+Reduces token usage by:
+
+* Removing low-value chunks
+* Enforcing token budgets
+* Prioritizing high-relevance context
+
+---
+
+## Prompt Compression
+
+Uses **LLMLingua-2** to:
+
+* Compress prompts
+* Remove redundant instructions
+* Reduce token consumption
+
+Average compression: **~45%**
+
+---
+
+## Quality-Aware Model Routing
+
+Automatically selects the most cost-effective model.
+
+### Simple Queries
+
+```text
+groq/llama-3.1-8b-instant
+```
+
+### Complex Queries
+
+```text
+groq/llama-3.3-70b-versatile
+```
+
+This significantly lowers overall inference cost.
+
+---
+
+## Security Guardrails
+
+Protects the system against:
+
+* Prompt injection attacks
+* PII leakage
+* Secret exposure
+* Malicious retrieval content
+
+---
+
+## Cost Tracking
+
+Tracks:
+
+* Input tokens
+* Output tokens
+* Estimated API cost
+* Cost savings
+* Latency
+
+No paid API usage required for benchmarking.
+
+---
+
+## Quality Evaluation
+
+Evaluates generated answers using:
+
+* Faithfulness
+* Answer Relevancy
+* Text Similarity Metrics
+
+Ensures optimization does not excessively reduce answer quality.
+
+---
+
+# 📊 Benchmark Results
+
+| Metric                   | Baseline  | Optimized Gateway |
+| ------------------------ | --------- | ----------------- |
+| Avg Input Tokens         | 1,704     | 1,788             |
+| Estimated Cost / Request | $0.001140 | $0.000136         |
+| Cost Reduction           | —         | **90.9% Peak**    |
+| Average Cost Reduction   | —         | **58.1%**         |
+| Cache Hit Rate           | —         | **31.2%**         |
+| Cache Response Time      | —         | **12ms**          |
+| LLM Response Time        | —         | **~1.6s**         |
+
+---
+
+# 🛠️ Tech Stack
+
+| Layer          | Technology                      |
+| -------------- | ------------------------------- |
+| Workflow       | LangGraph, LangChain            |
+| LLM Provider   | Groq API                        |
+| Model Routing  | LiteLLM                         |
+| Vector Store   | ChromaDB                        |
+| Retrieval      | BM25 + Dense Retrieval          |
+| Embeddings     | HuggingFace                     |
+| Reranking      | CrossEncoder                    |
+| Compression    | LLMLingua-2                     |
+| Evaluation     | Custom Faithfulness + Relevancy |
+| Security       | Regex-based Guardrails          |
+| Metrics        | SQLite                          |
+| Dashboard      | Streamlit + Plotly              |
+| Token Counting | tiktoken                        |
+
+---
+
+# 📁 Project Structure
+
+```text
+llm-efficiency-gateway/
+│
+├── configs/
+│   ├── model_router.json
+│   └── pricing.json
+│
+├── data/
+│   └── papers/
+│
+├── dashboard/
+│   └── app.py
+│
+├── scripts/
+│   ├── ingest_papers_step2.py
+│   ├── run_workflow_step10.py
+│   ├── benchmark_report.py
+│   └── diagnose.py
+│
+├── src/
+│   └── efficiency_gateway/
+│       ├── cache/
+│       ├── core/
+│       ├── evaluation/
+│       ├── llm/
+│       ├── rag/
+│       ├── routing/
+│       ├── security/
+│       └── workflows/
+│
+└── requirements.txt
+```
+
+---
+
+# ⚙️ Installation
+
+## Clone Repository
+
+```bash
 git clone https://github.com/KanishThakkar/llm-efficiency-gateway.git
 cd llm-efficiency-gateway
+```
 
-2. Install dependencies
+## Install Dependencies
+
+```bash
 pip install -r requirements.txt
-3. Set your Groq API key
- # Get free API key from https://console.groq.com
-$env:GROQ_API_KEY = "your-groq-api-key-here"   # PowerShell
-export GROQ_API_KEY="your-groq-api-key-here"    # Linux/Mac
-4. Add PDF papers and ingest
-# Add PDF files to data/papers/
-# Recommended: download from arxiv.org
-#   - Attention Is All You Need
-#   - RAG paper 
-#   - LoRA
-#   - Quantization
+```
+
+## Configure API Key
+
+### Windows PowerShell
+
+```powershell
+$env:GROQ_API_KEY="your-api-key"
+```
+
+### Linux / Mac
+
+```bash
+export GROQ_API_KEY="your-api-key"
+```
+
+---
+
+# 📚 Ingest Research Papers
+
+Place PDFs inside:
+
+```text
+data/papers/
+```
+
+Recommended papers:
+
+* Attention Is All You Need
+* Retrieval-Augmented Generation (RAG)
+* LoRA
+* Quantization
+
+Run:
+
+```bash
 python scripts/ingest_papers_step2.py
+```
 
-5. Run diagnostics (verify everything works)
-python scripts/diagnose.py
+---
 
-6. Run a query
+# ▶️ Run Workflow
+
+```bash
 python scripts/run_workflow_step10.py
+```
 
-7. Run benchmark
+---
+
+# 🧪 Benchmark
+
+```bash
 python scripts/benchmark_report.py
+```
 
-8. Launch dashboard
+---
+
+# 📈 Launch Dashboard
+
+```bash
 streamlit run dashboard/app.py
+```
 
-📁 Project Structure
-llm-efficiency-gateway/
-├── src/efficiency_gateway/
-│   ├── workflows/
-│   │   └── rag_gateway_graph.py      # LangGraph pipeline
-│   ├── security/
-│   │   └── input_guard.py            # Prompt injection + PII guard
-│   ├── cache/
-│   │   └── semantic_cache.py         # ChromaDB semantic cache
-│   ├── rag/
-│   │   ├── hybrid_retriever.py       # BM25 + vector hybrid search
-│   │   ├── reranker.py               # CrossEncoder reranking
-│   │   ├── context_pruner.py         # Adaptive token pruning
-│   │   ├── prompt_compressor.py      # LLMLingua-2 compression
-│   │   └── prompt_builder.py         # RAG prompt construction
-│   ├── routing/
-│   │   └── model_router.py           # Quality-aware model routing
-│   ├── llm/
-│   │   └── answer_generator.py       # LiteLLM answer generation
-│   ├── evaluation/
-│   │   └── ragas_evaluator.py        # Quality evaluation
-│   └── core/
-│       ├── token_counter.py          # tiktoken token counting
-│       ├── cost_tracker.py           # Cost estimation
-│       └── metrics_store.py          # SQLite metrics storage
-├── scripts/
-│   ├── run_workflow_step10.py        # Single query runner
-│   ├── benchmark_report.py           # Benchmark 5 queries
-│   ├── ingest_papers_step2.py        # Ingest PDF papers
-│   └── diagnose.py                   # Component health check
-├── dashboard/
-│   └── app.py                        # Streamlit dashboard
-├── configs/
-│   ├── model_router.json             # Model tier configuration
-│   └── pricing.json                  # API pricing config
-├── data/
-│   └── papers/                       # Add your PDF papers here
-└── requirements.txt
+---
 
-📈 Dashboard
-The Streamlit dashboard shows:
+# 📊 Dashboard Features
 
-KPI cards — total runs, cache hit rate, avg cost reduction, avg latency
-Cost-Quality Pareto — cost vs quality per model (bubble size = tokens saved)
-Token Savings chart — baseline vs optimised input tokens per run
-Model Usage pie — routing distribution across models
-Latency histogram — cache hits vs LLM calls
-Quality by model — box plot comparing model quality scores
-Recent runs table — full history with all metrics
+The Streamlit dashboard provides:
 
-You can see the streamlit web app screenshot - 
-<img width="1900" height="876" alt="image" src="https://github.com/user-attachments/assets/999b303c-0aa9-45ce-8439-bc0d4abb445d" />
-<img width="1898" height="703" alt="image" src="https://github.com/user-attachments/assets/95b3ec10-5f17-418d-8409-dd611daa4c29" />
-<img width="2076" height="930" alt="image" src="https://github.com/user-attachments/assets/84fcdb49-1723-4d26-b5d3-b54b63f720b5" />
+* KPI Cards
+* Cost Savings Analysis
+* Cache Hit Metrics
+* Cost–Quality Pareto Frontier
+* Model Usage Distribution
+* Latency Analysis
+* Token Savings Trends
+* Historical Query Runs
 
+---
 
+# 💡 Design Decisions
 
+### LiteLLM
 
-💡 Key Design Decisions
-LiteLLM for model abstraction — swap Groq for OpenAI/Anthropic/Ollama with one config change
-LangGraph for workflow — conditional edges enable clean cache-hit/miss branching
-ChromaDB for both vector store and semantic cache — single dependency, persistent storage
-Regex-based security guard — no heavy ML models required, works on any machine
-SQLite for metrics — zero infrastructure, fully portable
+Provider-agnostic model abstraction.
 
-🔧 Configuration
-Switch models — edit configs/model_router.json:
+Switch between:
 
-{
-  "defaults": {
-    "cheap_model": "groq/llama-3.1-8b-instant",
-    "strong_model": "groq/llama-3.3-70b-versatile",
-    "local_model": "local-quantized"
-  }
-}
-Adjust pricing — edit configs/pricing.json to match your provider's rates.
+* Groq
+* OpenAI
+* Anthropic
+* Ollama
+
+with minimal code changes.
+
+### LangGraph
+
+Provides:
+
+* Conditional routing
+* State management
+* Cache hit/miss branching
+
+### ChromaDB
+
+Used for:
+
+* Vector retrieval
+* Semantic caching
+
+Single persistent storage solution.
+
+### SQLite
+
+Chosen for:
+
+* Simplicity
+* Zero infrastructure
+* Portability
+
+---
+
