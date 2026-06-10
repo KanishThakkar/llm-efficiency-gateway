@@ -368,6 +368,12 @@ The Streamlit dashboard provides:
 * Historical Query Runs
 
 ---
+Here are some dashboard screenshots
+<img width="1882" height="871" alt="image" src="https://github.com/user-attachments/assets/8c281854-2bb5-4f37-8816-9afbe6f32d81" />
+<img width="1892" height="657" alt="image" src="https://github.com/user-attachments/assets/3047b9d9-81dc-493b-a2cd-38bea13a9514" />
+<img width="1860" height="413" alt="image" src="https://github.com/user-attachments/assets/f717e113-ab79-48c6-a183-5ef39e82dbe5" />
+
+
 
 # 💡 Design Decisions
 
