@@ -1,0 +1,20 @@
+{
+  "currency": "USD",
+  "models": {
+    "groq/llama-3.1-8b-instant": {
+      "provider": "groq",
+      "input_per_million": 0.05,
+      "output_per_million": 0.08
+    },
+    "groq/llama-3.3-70b-versatile": {
+      "provider": "groq",
+      "input_per_million": 0.59,
+      "output_per_million": 0.79
+    },
+    "local-quantized": {
+      "provider": "local",
+      "input_per_million": 0.0,
+      "output_per_million": 0.0
+    }
+  }
+}

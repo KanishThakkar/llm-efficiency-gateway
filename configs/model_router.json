@@ -1,0 +1,28 @@
+{
+  "models": {
+    "local-quantized": {
+      "tier": "local",
+      "quality": 0.55,
+      "max_input_tokens": 4096,
+      "best_for": ["classification", "simple_summary", "query_rewrite"]
+    },
+    "groq/llama-3.1-8b-instant": {
+      "tier": "cheap",
+      "quality": 0.78,
+      "max_input_tokens": 131072,
+      "best_for": ["normal_rag", "summarization", "medium_reasoning"]
+    },
+    "groq/llama-3.3-70b-versatile": {
+      "tier": "strong",
+      "quality": 0.93,
+      "max_input_tokens": 131072,
+      "best_for": ["hard_reasoning", "low_retrieval_confidence", "high_quality"]
+    }
+  },
+  "defaults": {
+    "cheap_model": "groq/llama-3.1-8b-instant",
+    "strong_model": "groq/llama-3.3-70b-versatile",
+    "local_model": "local-quantized",
+    "default_output_tokens": 600
+  }
+}
