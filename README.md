@@ -6,7 +6,6 @@
 ![LangGraph](https://img.shields.io/badge/LangGraph-Agent%20Workflow-green)
 ![RAG](https://img.shields.io/badge/RAG-Hybrid%20Search-orange)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red)
-![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
 ---
 
